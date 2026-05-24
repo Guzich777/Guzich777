@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Metaverse Commerce — Опыт продаж компаний через метавселенные</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@200;300;400;500;600&family=Manrope:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080B11;
+    --bg-mute: #1A1D24;
+    --white: #FFFFFF;
+    --text: #E2E8F0;
+    --text-mute: #94A3B8;
+    --gray: #6B7280;
+    --cyan: #00F2FF;
+    --violet: #9D4EDD;
+    --card: rgba(255, 255, 255, 0.04);
+    --card-border: rgba(255, 255, 255, 0.08);
+    --card-strong: rgba(255, 255, 255, 0.06);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    width: 100%;
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', 'Manrope', system-ui, sans-serif;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* === DEEP SPACE BACKGROUND === */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(circle at 15% 20%, rgba(0, 242, 255, 0.18) 0%, transparent 45%),
+      radial-gradient(circle at 85% 80%, rgba(157, 78, 221, 0.22) 0%, transparent 50%),
+      radial-gradient(circle at 50% 110%, rgba(0, 242, 255, 0.1) 0%, transparent 60%);
+    filter: blur(60px);
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,0.4), transparent),
+      radial-gradient(1px 1px at 60% 70%, rgba(255,255,255,0.3), transparent),
+      radial-gradient(1px 1px at 80% 20%, rgba(255,255,255,0.5), transparent),
+      radial-gradient(1px 1px at 30% 80%, rgba(255,255,255,0.3), transparent),
+      radial-gradient(1px 1px at 70% 40%, rgba(255,255,255,0.4), transparent),
+      radial-gradient(1px 1px at 90% 60%, rgba(255,255,255,0.3), transparent),
+      radial-gradient(1px 1px at 10% 50%, rgba(255,255,255,0.4), transparent),
+      radial-gradient(1px 1px at 45% 15%, rgba(255,255,255,0.3), transparent);
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.5;
+  }
+
+  /* === SLIDE CONTAINER === */
+  .deck { position: relative; width: 100vw; height: 100vh; z-index: 1; }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    padding: 5vh 7vw;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    overflow: hidden;
+  }
+  .slide.active { display: flex; opacity: 1; }
+
+  /* === TYPOGRAPHY === */
+  .eyebrow {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--cyan);
+    font-weight: 400;
+    margin-bottom: 1.2rem;
+    opacity: 0.85;
+  }
+
+  h1.title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 300;
+    font-size: clamp(3rem, 6vw, 5.5rem);
+    line-height: 1.05;
+    color: var(--white);
+    letter-spacing: -0.02em;
+    margin-bottom: 1.5rem;
+  }
+
+  h2.heading {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 300;
+    font-size: clamp(2rem, 4vw, 3.4rem);
+    line-height: 1.1;
+    color: var(--white);
+    letter-spacing: -0.015em;
+    margin-bottom: 2.5rem;
+    max-width: 75%;
+  }
+
+  h3 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 400;
+    font-size: 1.3rem;
+    color: var(--white);
+    letter-spacing: -0.005em;
+    margin-bottom: 0.6rem;
+  }
+
+  p, li { font-size: 1.05rem; line-height: 1.6; color: var(--text); font-weight: 400; }
+  .lead { font-size: 1.3rem; max-width: 60ch; color: var(--text); }
+
+  strong, b { color: var(--white); font-weight: 500; }
+  .accent { color: var(--cyan); }
+  .violet { color: var(--violet); }
+
+  /* === GLASS CARDS === */
+  .card {
+    background: var(--card);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid var(--card-border);
+    border-radius: 24px;
+    padding: 2rem 2.2rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .card.cyan { box-shadow: 0 0 60px rgba(0, 242, 255, 0.08), inset 0 0 0 1px rgba(0, 242, 255, 0.12); }
+  .card.violet { box-shadow: 0 0 60px rgba(157, 78, 221, 0.1), inset 0 0 0 1px rgba(157, 78, 221, 0.15); }
+  .card.glow::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: 24px;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(0,242,255,0.4), transparent 40%, rgba(157,78,221,0.3));
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  .num {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 200;
+    color: var(--cyan);
+    letter-spacing: -0.04em;
+    line-height: 1;
+  }
+
+  /* === LAYOUTS === */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+  .three-col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.6rem; }
+  .four-col { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.2rem; }
+
+  .pill {
+    display: inline-block;
+    padding: 0.4rem 1rem;
+    border: 1px solid rgba(0,242,255,0.3);
+    border-radius: 100px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.8rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--cyan);
+  }
+  .pill.violet { border-color: rgba(157,78,221,0.4); color: var(--violet); }
+  .pill.gray { border-color: rgba(107,114,128,0.4); color: var(--gray); }
+
+  ul.clean { list-style: none; padding: 0; }
+  ul.clean li {
+    padding-left: 1.6rem;
+    position: relative;
+    margin-bottom: 0.9rem;
+    color: var(--text);
+  }
+  ul.clean li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.7rem;
+    width: 8px;
+    height: 1px;
+    background: var(--cyan);
+    box-shadow: 0 0 6px var(--cyan);
+  }
+
+  /* === NAVIGATION === */
+  .nav {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    z-index: 10;
+    font-family: 'Space Grotesk', sans-serif;
+  }
+  .nav button {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.03);
+    backdrop-filter: blur(12px);
+    color: var(--white);
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.2s;
+  }
+  .nav button:hover { border-color: var(--cyan); color: var(--cyan); box-shadow: 0 0 20px rgba(0,242,255,0.3); }
+  .counter {
+    font-size: 0.85rem;
+    letter-spacing: 0.15em;
+    color: var(--text-mute);
+    min-width: 60px;
+    text-align: center;
+  }
+  .counter .cur { color: var(--white); }
+
+  .progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--cyan), var(--violet));
+    box-shadow: 0 0 12px var(--cyan);
+    z-index: 11;
+    transition: width 0.4s ease;
+    width: 0;
+  }
+
+  .brand {
+    position: fixed;
+    top: 1.6rem;
+    left: 2rem;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.35em;
+    color: var(--text-mute);
+    text-transform: uppercase;
+    z-index: 10;
+  }
+  .brand span { color: var(--cyan); }
+
+  /* === SLIDE 1 — TITLE === */
+  .slide-title { align-items: center; justify-content: center; text-align: center; }
+  .slide-title .title { font-size: clamp(3.5rem, 8vw, 7rem); margin-bottom: 1rem; }
+  .slide-title .sub { font-size: 1.2rem; color: var(--text-mute); letter-spacing: 0.05em; max-width: 50ch; }
+  .title-glow {
+    position: absolute;
+    width: 60vw;
+    height: 60vw;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0,242,255,0.18), transparent 60%);
+    right: -15vw;
+    bottom: -15vw;
+    filter: blur(40px);
+    z-index: -1;
+  }
+  .title-glow.v {
+    background: radial-gradient(circle, rgba(157,78,221,0.18), transparent 60%);
+    left: -15vw;
+    top: -15vw;
+    right: auto;
+    bottom: auto;
+  }
+
+  /* === SLIDE 2 — PARADIGM === */
+  .paradigm { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 3rem; height: 60vh; }
+  .paradigm .side { padding: 2rem; border-radius: 20px; height: 100%; display: flex; flex-direction: column; justify-content: space-between; }
+  .paradigm .old { background: rgba(255,255,255,0.02); filter: grayscale(0.7); opacity: 0.55; border: 1px solid rgba(255,255,255,0.06); }
+  .paradigm .new { background: var(--card); backdrop-filter: blur(24px); border: 1px solid rgba(0,242,255,0.2); box-shadow: 0 0 60px rgba(0,242,255,0.12); }
+  .paradigm .arrow { font-size: 2rem; color: var(--cyan); text-shadow: 0 0 20px var(--cyan); }
+  .paradigm .label { font-family: 'Space Grotesk', sans-serif; font-size: 0.75rem; letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 1rem; }
+  .paradigm .old .label { color: var(--gray); }
+  .paradigm .new .label { color: var(--cyan); }
+  .paradigm .visual {
+    font-size: 4rem;
+    text-align: center;
+    margin: 2rem 0;
+    opacity: 0.6;
+  }
+  .paradigm .new .visual { color: var(--cyan); opacity: 0.9; text-shadow: 0 0 30px var(--cyan); }
+
+  /* === SLIDE 3 — D2A / PHYGITAL === */
+  .duo { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 2rem; }
+  .duo .card { padding: 2.5rem; min-height: 380px; display: flex; flex-direction: column; justify-content: space-between; }
+  .duo h3 { font-size: 2.2rem; font-weight: 300; margin-bottom: 0.4rem; }
+  .duo .tag { font-family: 'Space Grotesk', sans-serif; font-size: 0.8rem; letter-spacing: 0.25em; text-transform: uppercase; margin-bottom: 1.5rem; }
+  .duo .left .tag { color: var(--cyan); }
+  .duo .right .tag { color: var(--violet); }
+  .duo .left h3 { color: var(--cyan); }
+  .duo .right h3 { color: var(--violet); }
+
+  /* === SLIDE 6 — META FAILURE === */
+  .slide.failure {
+    background: var(--bg-mute);
+  }
+  .slide.failure::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 50%, rgba(107,114,128,0.05), transparent 70%);
+    z-index: 0;
+  }
+  .slide.failure * { color: var(--gray) !important; }
+  .slide.failure .heading { color: #9CA3AF !important; }
+  .slide.failure .card {
+    background: rgba(255,255,255,0.02);
+    border-color: rgba(107,114,128,0.15);
+    box-shadow: none;
+  }
+  .slide.failure .num { color: #4B5563 !important; }
+  .empty-room {
+    text-align: center;
+    padding: 3rem 0;
+    font-size: 5rem;
+    color: #374151 !important;
+    letter-spacing: 1rem;
+    opacity: 0.4;
+  }
+
+  /* === SLIDE 7 — LESSON === */
+  .fork { display: grid; grid-template-columns: 1fr auto 1fr; gap: 2rem; align-items: stretch; }
+  .fork .path { padding: 2rem; border-radius: 20px; }
+  .fork .down { background: rgba(107,114,128,0.05); border: 1px solid rgba(107,114,128,0.2); }
+  .fork .down * { color: var(--gray); }
+  .fork .up { background: var(--card); border: 1px solid rgba(0,242,255,0.25); box-shadow: 0 0 50px rgba(0,242,255,0.1); }
+  .fork .divider { width: 1px; background: linear-gradient(180deg, transparent, var(--cyan), transparent); position: relative; }
+
+  /* === SLIDE 10 — HERO NUMBER === */
+  .hero-num {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 200;
+    font-size: clamp(7rem, 16vw, 14rem);
+    line-height: 0.9;
+    color: var(--cyan);
+    text-shadow: 0 0 60px rgba(0,242,255,0.4);
+    letter-spacing: -0.05em;
+  }
+  .hero-num-small {
+    font-size: clamp(4rem, 8vw, 7rem);
+  }
+
+  .steps { display: flex; align-items: center; gap: 1rem; margin-top: 2rem; }
+  .steps .step { flex: 1; padding: 1.5rem; }
+  .steps .arrow { font-size: 1.5rem; color: var(--cyan); }
+
+  /* === SLIDE 12 — COMPARISON === */
+  .vs-grid {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 4rem;
+    margin-top: 3rem;
+  }
+  .vs-block { text-align: center; }
+  .vs-block .big {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 200;
+    font-size: clamp(5rem, 12vw, 10rem);
+    line-height: 1;
+    letter-spacing: -0.04em;
+  }
+  .vs-block .label {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.95rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-top: 1rem;
+    color: var(--text-mute);
+  }
+  .vs-block.dim .big { color: var(--gray); }
+  .vs-block.dim .label { color: var(--gray); }
+  .vs-block.bright .big { color: var(--cyan); text-shadow: 0 0 60px rgba(0,242,255,0.4); }
+  .vs-block.bright .label { color: var(--cyan); }
+  .vs-divider {
+    height: 200px;
+    width: 1px;
+    background: linear-gradient(180deg, transparent, rgba(255,255,255,0.3), transparent);
+    position: relative;
+  }
+  .vs-divider::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--cyan);
+    box-shadow: 0 0 30px var(--cyan);
+  }
+
+  /* === SLIDE 13 — THREE EFFECTS === */
+  .effects { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.6rem; }
+  .effects .card { padding: 2rem; min-height: 320px; display: flex; flex-direction: column; }
+  .effects .n {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 300;
+    font-size: 2.6rem;
+    color: var(--cyan);
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.03em;
+  }
+  .effects .card-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 400;
+    color: var(--white);
+    margin-bottom: 1.2rem;
+  }
+
+  /* === SLIDE 14 — CONCLUSION === */
+  .slide.conclusion { align-items: center; justify-content: center; text-align: center; }
+  .conclusion .heading {
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    max-width: 22ch;
+    margin: 0 auto 3rem;
+  }
+  .conclusion ul.clean {
+    max-width: 60ch;
+    margin: 0 auto;
+    text-align: left;
+  }
+
+  /* === SLIDE 15 — SOURCES === */
+  .sources { display: flex; flex-direction: column; gap: 1.2rem; margin-top: 1.5rem; }
+  .source-row { display: grid; grid-template-columns: 60px 1fr; gap: 1.5rem; padding: 1.6rem 1.8rem; }
+  .source-row .n {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 300;
+    font-size: 1.8rem;
+    color: var(--cyan);
+  }
+  .source-row h4 { font-family: 'Space Grotesk', sans-serif; font-weight: 500; font-size: 1.05rem; color: var(--white); margin-bottom: 0.3rem; letter-spacing: 0.02em; }
+  .source-row p { font-size: 0.92rem; color: var(--text-mute); word-break: break-all; }
+  .source-row a { color: var(--cyan); text-decoration: none; }
+
+  /* === HINTS === */
+  .hint {
+    position: fixed;
+    bottom: 2.2rem;
+    left: 2rem;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.25em;
+    color: var(--text-mute);
+    text-transform: uppercase;
+    z-index: 10;
+    opacity: 0.6;
+  }
+
+  /* === AVATAR SLIDE === */
+  .avatar-scene { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 3rem; margin-top: 2rem; }
+  .avatar-figure {
+    width: 220px;
+    height: 320px;
+    margin: 0 auto;
+    background: radial-gradient(ellipse at center, rgba(157,78,221,0.3), transparent 70%);
+    border-radius: 50% 50% 30% 30% / 35% 35% 30% 30%;
+    position: relative;
+    filter: blur(2px);
+  }
+  .avatar-figure::before {
+    content: '';
+    position: absolute;
+    inset: 20%;
+    border: 1px solid rgba(157,78,221,0.4);
+    border-radius: 50%;
+    top: 5%;
+    bottom: 60%;
+  }
+
+  .tag-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+  .tag-grid .card { padding: 1.2rem 1.5rem; }
+  .tag-grid h4 { font-family: 'Space Grotesk', sans-serif; color: var(--cyan); font-weight: 400; font-size: 1rem; letter-spacing: 0.05em; margin-bottom: 0.3rem; }
+  .tag-grid p { font-size: 0.88rem; color: var(--text-mute); }
+
+  /* === GUCCI SLIDE === */
+  .gucci { display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 3rem; align-items: center; }
+  .bag-glow {
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 50% 50%, rgba(157,78,221,0.4), transparent 60%),
+      radial-gradient(circle at 50% 50%, rgba(255,255,255,0.05), transparent 40%);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    filter: blur(0.5px);
+  }
+  .bag-glow::before {
+    content: '◆';
+    font-size: 8rem;
+    color: var(--violet);
+    text-shadow: 0 0 50px var(--violet);
+    opacity: 0.9;
+  }
+  .quote-card {
+    margin-top: 1.6rem;
+    border-left: 2px solid var(--violet);
+    padding-left: 1.5rem;
+    font-style: italic;
+    color: var(--text);
+    font-size: 1.05rem;
+    line-height: 1.5;
+  }
+
+  /* === AUTO SLIDE === */
+  .car-cube {
+    aspect-ratio: 16/10;
+    border: 1px solid rgba(0,242,255,0.3);
+    background: linear-gradient(180deg, rgba(0,242,255,0.05), transparent);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 5rem;
+    color: var(--cyan);
+    text-shadow: 0 0 40px var(--cyan);
+    margin-bottom: 2rem;
+    position: relative;
+  }
+  .car-cube::before, .car-cube::after {
+    content: '';
+    position: absolute;
+    background: var(--cyan);
+    box-shadow: 0 0 8px var(--cyan);
+  }
+  .car-cube::before { width: 8px; height: 8px; top: -4px; left: -4px; border-radius: 50%; }
+  .car-cube::after { width: 8px; height: 8px; bottom: -4px; right: -4px; border-radius: 50%; }
+
+  /* fade-in animation on slide entry */
+  .slide.active .card,
+  .slide.active .vs-block,
+  .slide.active .hero-num,
+  .slide.active .heading,
+  .slide.active .title,
+  .slide.active .lead,
+  .slide.active .duo,
+  .slide.active ul.clean li {
+    animation: rise 0.7s ease forwards;
+  }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(20px); filter: blur(6px); }
+    to   { opacity: 1; transform: translateY(0);    filter: blur(0); }
+  }
+</style>
+</head>
+<body>
+
+<div class="brand"><span>V·</span>COMMERCE · 2026</div>
+<div class="progress" id="progress"></div>
+
+<div class="deck" id="deck">
+
+  <!-- ============ SLIDE 1 — TITLE ============ -->
+  <section class="slide slide-title active">
+    <div class="title-glow v"></div>
+    <div class="title-glow"></div>
+    <div class="eyebrow">V·Commerce · 2026</div>
+    <h1 class="title">Metaverse Commerce.<br/>Новая география продаж.</h1>
+    <p class="sub">Опыт продаж компаний через метавселенные —<br/>от Direct-to-Avatar до Phygital</p>
+  </section>
+
+  <!-- ============ SLIDE 2 — PARADIGM ============ -->
+  <section class="slide">
+    <div class="eyebrow">01 · Смена парадигмы</div>
+    <h2 class="heading">От плоского скролла —<br/>к трёхмерному опыту.</h2>
+    <div class="paradigm">
+      <div class="side old">
+        <div>
+          <div class="label">2D · E-Commerce</div>
+        </div>
+        <div class="visual">▭ ▭ ▭<br/>▭ ▭ ▭</div>
+        <p style="color: var(--gray); font-size:0.95rem;">Скучный скроллинг плоских веб-страниц интернет-магазинов и маркетплейсов.</p>
+      </div>
+      <div class="arrow">→</div>
+      <div class="side new">
+        <div>
+          <div class="label">3D · V-Commerce</div>
+        </div>
+        <div class="visual">◇</div>
+        <p style="font-size:0.95rem;">Трёхмерное цифровое пространство, где бренды выстраивают <strong>принципиально новый клиентский опыт</strong>.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 3 — D2A / PHYGITAL ============ -->
+  <section class="slide">
+    <div class="eyebrow">02 · Две модели</div>
+    <h2 class="heading">Две экономики одной метавселенной.</h2>
+    <div class="duo">
+      <div class="card cyan glow left">
+        <div>
+          <div class="tag">Модель 01</div>
+          <h3>D2A — Direct-to-Avatar</h3>
+        </div>
+        <ul class="clean" style="margin-top:1.5rem">
+          <li>Прямые продажи <strong>цифровых товаров</strong></li>
+          <li>Одежда, аксессуары, недвижимость</li>
+          <li>Существуют <strong>только внутри виртуального мира</strong></li>
+        </ul>
+      </div>
+      <div class="card violet glow right">
+        <div>
+          <div class="tag">Модель 02</div>
+          <h3>Phygital</h3>
+        </div>
+        <ul class="clean" style="margin-top:1.5rem">
+          <li>Реальный товар через <strong>3D-опыт</strong> в метавселенной</li>
+          <li>Заказ с <strong>доставкой на дом</strong></li>
+          <li>Инициирован внутри виртуального пространства</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 4 — AUDIENCE ============ -->
+  <section class="slide">
+    <div class="eyebrow">03 · Аудитория</div>
+    <h2 class="heading">Поколения, для которых<br/>виртуальное = реальное.</h2>
+    <div class="two-col" style="margin-top: 2rem; align-items: center;">
+      <div>
+        <ul class="clean" style="font-size:1.15rem">
+          <li>Целевая аудитория v-commerce — <strong class="accent">Gen Z</strong> и <strong class="accent">Gen Alpha</strong></li>
+          <li>Они проводят в виртуальных мирах больше времени, <strong>чем в торговых центрах</strong></li>
+          <li>Для бизнеса это <strong>не игрушка</strong>, а способ присутствия там, где живёт аудитория</li>
+        </ul>
+      </div>
+      <div style="display:flex; justify-content:center; gap:2rem;">
+        <div class="card cyan" style="text-align:center; padding:2rem 1.5rem; min-width:160px;">
+          <div class="num" style="font-size:3rem">Z</div>
+          <div style="font-family:'Space Grotesk'; letter-spacing:0.2em; font-size:0.75rem; color:var(--text-mute); margin-top:0.5rem;">GENERATION</div>
+        </div>
+        <div class="card violet" style="text-align:center; padding:2rem 1.5rem; min-width:160px;">
+          <div class="num violet" style="font-size:3rem; color:var(--violet)">α</div>
+          <div style="font-family:'Space Grotesk'; letter-spacing:0.2em; font-size:0.75rem; color:var(--text-mute); margin-top:0.5rem;">GENERATION</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 5 — REALITY CHECK INTRO ============ -->
+  <section class="slide">
+    <div class="eyebrow gray" style="color: var(--gray);">04 · Реалити-чек</div>
+    <h2 class="heading">Прежде чем говорить об успехе —<br/>поговорим о провале.</h2>
+    <div style="max-width: 70ch; margin-top: 1rem;">
+      <ul class="clean" style="font-size:1.1rem">
+        <li>2021–2022: вокруг метавселенных надулся <strong>огромный пузырь</strong></li>
+        <li>Главное лицо хайпа — <strong>Марк Цукерберг</strong></li>
+        <li>Стратегический вопрос: концепция мертва — или мертва конкретная реализация?</li>
+      </ul>
+      <div class="card" style="margin-top:2.5rem; max-width: 600px; font-style: italic; color: var(--text-mute); border-left: 2px solid var(--cyan);">
+        <span style="color: var(--cyan); font-size:1.5rem;">"</span> Концепция метавселенных мертва.
+        <div style="font-family:'Space Grotesk'; font-size:0.75rem; letter-spacing:0.25em; text-transform:uppercase; margin-top:0.8rem; color: var(--gray);">— Аналитики, 2022</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 6 — META FAILURE ============ -->
+  <section class="slide failure">
+    <div class="eyebrow" style="color:#4B5563 !important;">05 · Кейс провала</div>
+    <h2 class="heading">Horizon Worlds.<br/>Урок на десятки миллиардов.</h2>
+    <div class="empty-room">· · · ·</div>
+    <div class="three-col">
+      <div class="card">
+        <div class="num" style="font-size:1.5rem">01</div>
+        <h3 style="margin-top:0.6rem">Renaming</h3>
+        <p style="font-size:0.95rem">Facebook → <strong>Meta</strong>. Десятки миллиардов долларов в собственную метавселенную.</p>
+      </div>
+      <div class="card">
+        <div class="num" style="font-size:1.5rem">02</div>
+        <h3 style="margin-top:0.6rem">Результат 2022</h3>
+        <p style="font-size:0.95rem">Пустые миры, слабая графика, над которой смеялся весь интернет.</p>
+      </div>
+      <div class="card">
+        <div class="num" style="font-size:1.5rem">03</div>
+        <h3 style="margin-top:0.6rem">Финансы</h3>
+        <p style="font-size:0.95rem">Гигантские убытки, жёсткое падение акций. Вывод аналитиков: «концепция мертва».</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 7 — LESSON ============ -->
+  <section class="slide">
+    <div class="eyebrow">06 · Главный урок</div>
+    <h2 class="heading">Нельзя навязать пользователям<br/>пустой мир «сверху».</h2>
+    <div class="fork">
+      <div class="path down">
+        <div class="pill gray">Путь Meta</div>
+        <h3 style="margin-top:1rem; color: var(--gray)">Построить платформу с нуля</h3>
+        <p style="margin-top: 0.8rem; font-size:0.95rem; color: var(--gray)">Создать мир «сверху» и надеяться, что в него придут пользователи. Итог — пустые виртуальные пространства.</p>
+        <div style="font-size:2rem; margin-top:1.5rem; color: var(--gray)">↓</div>
+      </div>
+      <div class="divider"></div>
+      <div class="path up">
+        <div class="pill">Путь брендов</div>
+        <h3 style="margin-top:1rem">Прийти туда, где уже есть аудитория</h3>
+        <p style="margin-top: 0.8rem; font-size:0.95rem">Roblox · Fortnite · Sandbox — живые игровые метавселенные с многомиллионной аудиторией.</p>
+        <div style="font-size:2rem; margin-top:1.5rem; color: var(--cyan); text-shadow: 0 0 20px var(--cyan);">↑</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 8 — GUCCI ============ -->
+  <section class="slide">
+    <div class="eyebrow violet" style="color: var(--violet)">07 · Кейс Gucci</div>
+    <h2 class="heading">Gucci Town.<br/>Когда пиксели стоят дороже кожи.</h2>
+    <div class="gucci">
+      <div class="bag-glow"></div>
+      <div>
+        <div class="card violet" style="margin-bottom: 1rem">
+          <h4 style="color: var(--violet); font-family:'Space Grotesk'; font-weight:500; letter-spacing:0.05em; margin-bottom:0.4rem;">Платформа</h4>
+          <p style="font-size:0.95rem">Постоянное пространство <strong>Gucci Town в Roblox</strong></p>
+        </div>
+        <div class="card violet" style="margin-bottom: 1rem">
+          <h4 style="color: var(--violet); font-family:'Space Grotesk'; font-weight:500; letter-spacing:0.05em; margin-bottom:0.4rem;">Механика</h4>
+          <p style="font-size:0.95rem">Мини-игры, общение, покупка <strong>цифрового мерча</strong> за внутреннюю валюту</p>
+        </div>
+        <div class="quote-card">
+          Цифровая копия сумки <strong>Gucci Queen Bee</strong> была перепродана на внутреннем рынке <strong style="color: var(--violet)">дороже реальной физической сумки</strong> в рознице.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 9 — AVATAR ECONOMY ============ -->
+  <section class="slide">
+    <div class="eyebrow violet" style="color: var(--violet)">08 · Экономика аватаров</div>
+    <h2 class="heading">Аватар — это продолжение личности.</h2>
+    <div class="avatar-scene">
+      <div class="tag-grid">
+        <div class="card">
+          <h4>Самовыражение</h4>
+          <p>Аватар как высказывание о себе</p>
+        </div>
+        <div class="card">
+          <h4>Статус</h4>
+          <p>Виртуальный люкс = реальный</p>
+        </div>
+      </div>
+      <div class="avatar-figure"></div>
+      <div class="tag-grid">
+        <div class="card">
+          <h4>Эксклюзивность</h4>
+          <p>Ограниченные дропы, лимиты</p>
+        </div>
+        <div class="card">
+          <h4>Идентичность</h4>
+          <p>Прямое продолжение «я» в сети</p>
+        </div>
+      </div>
+    </div>
+    <div style="text-align:center; margin-top:2rem; max-width: 70ch; margin-left:auto; margin-right:auto;">
+      <p style="font-size:1.05rem">Скины и цифровая одежда → <strong class="accent">высокомаржинальный бизнес</strong> без затрат на ткани, логистику и склады.</p>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 10 — NIKE ============ -->
+  <section class="slide">
+    <div class="eyebrow">09 · Кейс Nike</div>
+    <h2 class="heading">Nikeland.<br/>Метавселенная как примерочная.</h2>
+    <div class="two-col" style="align-items: center; gap: 4rem">
+      <div style="text-align: center">
+        <div class="hero-num">30M+</div>
+        <div style="font-family:'Space Grotesk'; letter-spacing:0.2em; font-size:0.85rem; color: var(--text-mute); text-transform:uppercase; margin-top:0.8rem;">посетителей Nikeland в Roblox</div>
+      </div>
+      <div>
+        <div class="card cyan" style="margin-bottom: 1rem; padding:1.2rem 1.6rem">
+          <div style="display:flex; align-items:center; gap:1rem">
+            <div class="num" style="font-size:1.4rem; min-width:30px">01</div>
+            <div><strong>Примерь</strong> новые модели кроссовок на аватаре</div>
+          </div>
+        </div>
+        <div class="card cyan" style="margin-bottom: 1rem; padding:1.2rem 1.6rem">
+          <div style="display:flex; align-items:center; gap:1rem">
+            <div class="num" style="font-size:1.4rem; min-width:30px">02</div>
+            <div><strong>Посмотри в движении</strong> во время спортивных игр</div>
+          </div>
+        </div>
+        <div class="card cyan" style="padding:1.2rem 1.6rem">
+          <div style="display:flex; align-items:center; gap:1rem">
+            <div class="num" style="font-size:1.4rem; min-width:30px">03</div>
+            <div><strong>Купи</strong> точно такую же физическую пару в реальном мире</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 11 — AUTO ============ -->
+  <section class="slide">
+    <div class="eyebrow">10 · Кейс автопрома</div>
+    <h2 class="heading">Hyundai и BMW.<br/>Виртуальный шоурум до сделки.</h2>
+    <div class="two-col" style="gap: 3rem; align-items: center">
+      <div>
+        <div class="car-cube">◇</div>
+        <div style="text-align: center; font-family:'Space Grotesk'; letter-spacing:0.3em; font-size:0.85rem; color: var(--text-mute); text-transform: uppercase;">Hyundai · BMW</div>
+      </div>
+      <div>
+        <ul class="clean">
+          <li>Виртуальные шоурумы с <strong>кастомной конфигурацией</strong> автомобиля</li>
+          <li>Детальное изучение салона в 3D</li>
+          <li>Интерактивный <strong>тест-драйв</strong> на трассах, недоступных в реальности</li>
+          <li>Эффект: <strong class="accent">прогрев</strong> → снятие страха покупки → <strong class="accent">готовая сделка</strong> в офлайн-дилерском центре</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 12 — VS NUMBERS ============ -->
+  <section class="slide">
+    <div class="eyebrow">11 · Главная метрика</div>
+    <h2 class="heading">Вовлечённость, которой нет нигде.</h2>
+    <div class="vs-grid">
+      <div class="vs-block dim">
+        <div class="big">2–3</div>
+        <div class="label">минуты<br/>интернет-магазин</div>
+      </div>
+      <div class="vs-divider"></div>
+      <div class="vs-block bright">
+        <div class="big">20–40</div>
+        <div class="label">минут<br/>метавселенная бренда</div>
+      </div>
+    </div>
+    <div style="text-align:center; margin-top: 3rem; font-size:1rem; color: var(--text-mute); letter-spacing: 0.05em;">
+      Множитель <strong class="accent">×10–13</strong> ко времени контакта с брендом · источник эффекта — <strong>геймификация</strong>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 13 — THREE EFFECTS ============ -->
+  <section class="slide">
+    <div class="eyebrow">12 · Бизнес-эффекты</div>
+    <h2 class="heading">Три эффекта,<br/>ради которых бренды инвестируют.</h2>
+    <div class="effects">
+      <div class="card cyan glow">
+        <div class="n">01</div>
+        <div class="card-title">Вовлечённость</div>
+        <ul class="clean">
+          <li>20–40 минут вместо 2–3</li>
+          <li>Эффект <strong>геймификации</strong></li>
+          <li>До <strong class="accent">×13</strong> ко времени сессии</li>
+        </ul>
+      </div>
+      <div class="card cyan glow">
+        <div class="n">02</div>
+        <div class="card-title">Тестирование без рисков</div>
+        <ul class="clean">
+          <li>Не нужно отшивать тестовую коллекцию или выпускать концепт-кар</li>
+          <li>Запустить цифровой аналог → собрать фидбэк → запустить производство</li>
+        </ul>
+      </div>
+      <div class="card cyan glow">
+        <div class="n">03</div>
+        <div class="card-title">Глобальный охват</div>
+        <ul class="clean">
+          <li>Виртуальный флагман доступен <strong class="accent">24/7</strong></li>
+          <li>Из любой точки планеты</li>
+          <li>Без аренды и зарплат продавцам</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 14 — CONCLUSION ============ -->
+  <section class="slide conclusion">
+    <div class="eyebrow">13 · Вывод</div>
+    <h2 class="heading">Хайп прошёл.<br/>Бизнес — остался.</h2>
+    <ul class="clean" style="font-size:1.1rem">
+      <li>Продажи в метавселенных — <strong>не краткосрочный хайп</strong></li>
+      <li>Провал Meta 2022 года <strong>отсеял нежизнеспособные концепты</strong></li>
+      <li>Побеждают те, кто создаёт <strong class="accent">полезный, увлекательный и коммерчески продуманный опыт</strong></li>
+      <li>Виртуальное присутствие → <strong class="accent">реальная прибыль</strong></li>
+    </ul>
+  </section>
+
+  <!-- ============ SLIDE 15 — SOURCES ============ -->
+  <section class="slide">
+    <div class="eyebrow">14 · Источники и аналитика</div>
+    <h2 class="heading" style="margin-bottom: 1.5rem">Источники и аналитика.</h2>
+    <div class="sources">
+      <div class="card source-row">
+        <div class="n">01</div>
+        <div>
+          <h4>InfoCity</h4>
+          <p>«10 главных метавселенных для игр, заработка и творчества»</p>
+          <p><a href="https://infocity.tech/2024/05/10-glavnyh-metavselennyh-dlja-igr-zarabotka-i-tvorchestva/" target="_blank">infocity.tech/2024/05/10-glavnyh-metavselennyh-dlja-igr-zarabotka-i-tvorchestva/</a></p>
+        </div>
+      </div>
+      <div class="card source-row">
+        <div class="n">02</div>
+        <div>
+          <h4>Отчёты платформ</h4>
+          <p>Roblox Investor Relations Data · Epic Games / Fortnite — бизнес-кейсы Nikeland и Gucci Town</p>
+        </div>
+      </div>
+      <div class="card source-row">
+        <div class="n">03</div>
+        <div>
+          <h4>Финансовая отчётность Meta</h4>
+          <p>Meta Reports / Reality Labs Losses 2022</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ============ NAVIGATION ============ -->
+<div class="hint">← / → · navigate</div>
+<div class="nav">
+  <button id="prev" aria-label="Previous">←</button>
+  <div class="counter"><span class="cur" id="cur">01</span> / <span id="total">15</span></div>
+  <button id="next" aria-label="Next">→</button>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  const curEl = document.getElementById('cur');
+  const totalEl = document.getElementById('total');
+  const progress = document.getElementById('progress');
+  let i = 0;
+
+  totalEl.textContent = String(total).padStart(2, '0');
+
+  function go(n) {
+    i = Math.max(0, Math.min(total - 1, n));
+    slides.forEach((s, idx) => s.classList.toggle('active', idx === i));
+    curEl.textContent = String(i + 1).padStart(2, '0');
+    progress.style.width = ((i + 1) / total * 100) + '%';
+  }
+
+  document.getElementById('next').addEventListener('click', () => go(i + 1));
+  document.getElementById('prev').addEventListener('click', () => go(i - 1));
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') go(i + 1);
+    if (e.key === 'ArrowLeft' || e.key === 'PageUp') go(i - 1);
+    if (e.key === 'Home') go(0);
+    if (e.key === 'End') go(total - 1);
+  });
+
+  // Click anywhere on the slide area (not nav) to advance
+  document.getElementById('deck').addEventListener('click', (e) => {
+    if (e.target.closest('.nav') || e.target.closest('a')) return;
+    go(i + 1);
+  });
+
+  // Init progress
+  go(0);
+</script>
+
+</body>
+</html>
